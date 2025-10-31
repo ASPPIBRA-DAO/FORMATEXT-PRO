@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   Card,
@@ -22,12 +22,23 @@ import {
   SelectValue,
 } from '../ui/select';
 import { Input } from '../ui/input';
-import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Separator } from '../ui/separator';
 import { Switch } from '../ui/switch';
 import { AlignCenter, AlignJustify, AlignLeft, AlignRight } from 'lucide-react';
+import { StyleSettings } from '@/lib/pdf-utils';
 
-export function SettingsCard() {
+interface SettingsCardProps {
+  styles: StyleSettings;
+  setStyles: (styles: StyleSettings) => void;
+}
+
+export function SettingsCard({ styles, setStyles }: SettingsCardProps) {
+
+  const handleStyleChange = (key: keyof StyleSettings, value: any) => {
+    setStyles({ ...styles, [key]: value });
+  };
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -44,69 +55,85 @@ export function SettingsCard() {
             <TabsTrigger value="layout">Page Layout</TabsTrigger>
             <TabsTrigger value="toc">Contents</TabsTrigger>
           </TabsList>
+          {/* Text & Font Settings */}
           <TabsContent value="text" className="pt-4">
             <div className="space-y-6">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="font-family">Font Family</Label>
-                  <Select defaultValue="inter">
+                  <Select 
+                    value={styles.fontFamily}
+                    onValueChange={(value) => handleStyleChange('fontFamily', value)}
+                  >
                     <SelectTrigger id="font-family">
-                      <SelectValue placeholder="Select a font" />
+                      <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="inter">Inter</SelectItem>
-                      <SelectItem value="literata">Literata</SelectItem>
-                      <SelectItem value="arial">Arial</SelectItem>
-                      <SelectItem value="times">Times New Roman</SelectItem>
+                      <SelectItem value="Inter">Inter</SelectItem>
+                      <SelectItem value="Literata">Literata</SelectItem>
+                      <SelectItem value="Arial">Arial</SelectItem>
+                      <SelectItem value="Times New Roman">Times New Roman</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="font-size">Font Size (pt)</Label>
-                  <Input id="font-size" type="number" defaultValue="12" />
+                  <Input 
+                    id="font-size" 
+                    type="number" 
+                    value={styles.fontSize}
+                    onChange={(e) => handleStyleChange('fontSize', parseInt(e.target.value, 10))}
+                  />
                 </div>
               </div>
               <div className="space-y-2">
                 <Label>Text Alignment</Label>
-                <RadioGroup defaultValue="justify" className="flex flex-wrap gap-2">
-                    <Label htmlFor="align-left" className="flex cursor-pointer items-center justify-center rounded-md border p-2 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary [&:has([data-state=checked])]:bg-accent">
-                        <RadioGroupItem value="left" id="align-left" className="sr-only" />
-                        <AlignLeft className="h-5 w-5" />
-                    </Label>
-                    <Label htmlFor="align-center" className="flex cursor-pointer items-center justify-center rounded-md border p-2 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary [&:has([data-state=checked])]:bg-accent">
-                        <RadioGroupItem value="center" id="align-center" className="sr-only" />
-                        <AlignCenter className="h-5 w-5" />
-                    </Label>
-                    <Label htmlFor="align-right" className="flex cursor-pointer items-center justify-center rounded-md border p-2 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary [&:has([data-state=checked])]:bg-accent">
-                        <RadioGroupItem value="right" id="align-right" className="sr-only" />
-                        <AlignRight className="h-5 w-5" />
-                    </Label>
-                    <Label htmlFor="align-justify" className="flex cursor-pointer items-center justify-center rounded-md border p-2 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary [&:has([data-state=checked])]:bg-accent">
-                        <RadioGroupItem value="justify" id="align-justify" className="sr-only" />
-                        <AlignJustify className="h-5 w-5" />
-                    </Label>
-                </RadioGroup>
+                <ToggleGroup 
+                  type="single" 
+                  defaultValue={styles.textAlign} 
+                  className="flex flex-wrap justify-start gap-2"
+                  onValueChange={(value) => handleStyleChange('textAlign', value)}
+                >
+                    <ToggleGroupItem value="left" aria-label="Align left"><AlignLeft className="h-5 w-5" /></ToggleGroupItem>
+                    <ToggleGroupItem value="center" aria-label="Align center"><AlignCenter className="h-5 w-5" /></ToggleGroupItem>
+                    <ToggleGroupItem value="right" aria-label="Align right"><AlignRight className="h-5 w-5" /></ToggleGroupItem>
+                    <ToggleGroupItem value="justify" aria-label="Align justify"><AlignJustify className="h-5 w-5" /></ToggleGroupItem>
+                </ToggleGroup>
               </div>
               <Separator />
                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="spacing-before">Spacing Before (pt)</Label>
-                  <Input id="spacing-before" type="number" defaultValue="0" />
+                  <Input 
+                    id="spacing-before" 
+                    type="number" 
+                    value={styles.spacingBefore}
+                    onChange={(e) => handleStyleChange('spacingBefore', parseInt(e.target.value, 10))}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="spacing-after">Spacing After (pt)</Label>
-                  <Input id="spacing-after" type="number" defaultValue="8" />
+                  <Input 
+                    id="spacing-after" 
+                    type="number" 
+                    value={styles.spacingAfter}
+                    onChange={(e) => handleStyleChange('spacingAfter', parseInt(e.target.value, 10))}
+                  />
                 </div>
               </div>
             </div>
           </TabsContent>
+          {/* Page Layout Settings */}
           <TabsContent value="layout" className="pt-4">
              <div className="space-y-6">
                 <div className="space-y-2">
                   <Label htmlFor="page-size">Page Size</Label>
-                  <Select defaultValue="a4">
+                  <Select 
+                    value={styles.pageSize}
+                    onValueChange={(value) => handleStyleChange('pageSize', value)}
+                  >
                     <SelectTrigger id="page-size">
-                      <SelectValue placeholder="Select page size" />
+                      <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="a4">A4</SelectItem>
@@ -116,28 +143,29 @@ export function SettingsCard() {
                   </Select>
                 </div>
                  <div className="space-y-4">
-                    <Label>Margins (cm)</Label>
+                    <Label>Margins (pt)</Label>
                     <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                          <div className="space-y-2">
                             <Label htmlFor="margin-top" className="text-sm text-muted-foreground">Top</Label>
-                            <Input id="margin-top" type="number" defaultValue="3" />
+                            <Input id="margin-top" type="number" value={styles.marginTop} onChange={(e) => handleStyleChange('marginTop', parseInt(e.target.value, 10))} />
                         </div>
                          <div className="space-y-2">
                             <Label htmlFor="margin-bottom" className="text-sm text-muted-foreground">Bottom</Label>
-                            <Input id="margin-bottom" type="number" defaultValue="2" />
+                            <Input id="margin-bottom" type="number" value={styles.marginBottom} onChange={(e) => handleStyleChange('marginBottom', parseInt(e.target.value, 10))} />
                         </div>
                          <div className="space-y-2">
                             <Label htmlFor="margin-left" className="text-sm text-muted-foreground">Left</Label>
-                            <Input id="margin-left" type="number" defaultValue="3" />
+                            <Input id="margin-left" type="number" value={styles.marginLeft} onChange={(e) => handleStyleChange('marginLeft', parseInt(e.target.value, 10))} />
                         </div>
                          <div className="space-y-2">
                             <Label htmlFor="margin-right" className="text-sm text-muted-foreground">Right</Label>
-                            <Input id="margin-right" type="number" defaultValue="2" />
+                            <Input id="margin-right" type="number" value={styles.marginRight} onChange={(e) => handleStyleChange('marginRight', parseInt(e.target.value, 10))} />
                         </div>
                     </div>
                 </div>
             </div>
           </TabsContent>
+          {/* Table of Contents Settings */}
           <TabsContent value="toc" className="pt-4">
             <div className="space-y-4">
                 <div className="flex items-center justify-between rounded-lg border p-4">
@@ -147,7 +175,11 @@ export function SettingsCard() {
                         Automatically generate a ToC from titles and chapters.
                         </p>
                     </div>
-                    <Switch id="toc-switch" defaultChecked />
+                    <Switch 
+                      id="toc-switch" 
+                      checked={styles.includeToc}
+                      onCheckedChange={(checked) => handleStyleChange('includeToc', checked)}
+                    />
                 </div>
             </div>
           </TabsContent>

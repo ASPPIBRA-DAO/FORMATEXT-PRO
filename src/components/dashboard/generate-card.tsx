@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { FileDown, Loader2 } from 'lucide-react';
 import { Button } from '../ui/button';
@@ -17,30 +17,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select';
-import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 
-export function GenerateCard() {
-  const { toast } = useToast();
+interface GenerateCardProps {
+  theme: string;
+  setTheme: (theme: string) => void;
+  onGeneratePdf: () => void;
+}
+
+export function GenerateCard({ theme, setTheme, onGeneratePdf }: GenerateCardProps) {
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const handleGenerateClick = () => {
+  const handleGenerateClick = async () => {
     setIsGenerating(true);
-    toast({
-      title: 'Generating PDF...',
-      description: 'Your perfectly formatted document is being created.',
-    });
-
-    setTimeout(() => {
+    // In a real app, you might want to show a toast here
+    try {
+      await onGeneratePdf();
+    } catch (error) {
+      console.error("PDF Generation failed:", error);
+      // Show an error toast
+    } finally {
       setIsGenerating(false);
-      toast({
-        title: 'PDF Generated Successfully!',
-        description:
-          'In a real app, your download would start automatically.',
-        variant: 'default',
-        duration: 5000,
-      });
-    }, 2500);
+    }
   };
 
   return (
@@ -54,14 +52,14 @@ export function GenerateCard() {
       <CardContent className="flex flex-col items-start gap-4 sm:flex-row">
         <div className="w-full flex-1 space-y-2">
           <Label htmlFor="pdf-theme">PDF Theme</Label>
-          <Select defaultValue="corporate">
+          <Select value={theme} onValueChange={setTheme}>
             <SelectTrigger id="pdf-theme">
               <SelectValue placeholder="Select a theme" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="corporate">Corporate Report</SelectItem>
-              <SelectItem value="academic">Academic Thesis</SelectItem>
-              <SelectItem value="manuscript">Book Manuscript</SelectItem>
+              <SelectItem value="Corporate Report">Corporate Report</SelectItem>
+              <SelectItem value="Academic Thesis">Academic Thesis</SelectItem>
+              <SelectItem value="Book Manuscript">Book Manuscript</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -72,11 +70,11 @@ export function GenerateCard() {
             className="w-full sm:w-auto"
           >
             {isGenerating ? (
-              <Loader2 className="animate-spin" />
+              <Loader2 className="h-5 w-5 animate-spin" />
             ) : (
-              <FileDown />
+              <FileDown className="h-5 w-5" />
             )}
-            <span>{isGenerating ? 'Generating...' : 'Generate PDF'}</span>
+            <span className="ml-2">{isGenerating ? 'Generating...' : 'Generate PDF'}</span>
           </Button>
         </div>
       </CardContent>
