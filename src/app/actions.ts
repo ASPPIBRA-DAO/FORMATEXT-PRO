@@ -21,7 +21,8 @@ export async function getLayoutSuggestions(
   });
 
   if (!parsed.success) {
-    return { data: null, error: parsed.error.flatten().fieldErrors.toString() };
+    const errorMessages = Object.values(parsed.error.flatten().fieldErrors).map(e => e?.join(' ')).join(' ');
+    return { data: null, error: errorMessages };
   }
 
   const input: ValidateAndSuggestLayoutInput = parsed.data;
